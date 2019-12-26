@@ -5,13 +5,14 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const compression = require('compression');
-const { uploadFromStream } = require('./storage');
+const { uploadFromStream, fetchBucketContents } = require('./storage');
 const Busboy = require('busboy');
 const app = express();
 
 app.use(express.static('./static'));
 app.use(express.urlencoded({ extended: true }));
 
+// uploads a file to the configured S3 bucket
 app.post('/upload', (req, res, next) => {
   const busboy = new Busboy({ headers: req.headers });
   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
@@ -24,6 +25,13 @@ app.post('/upload', (req, res, next) => {
     res.end("That's all folks!");
   });
   return req.pipe(busboy);
+});
+
+// fetches all objects from the configured S3 bucket
+app.get('/list', (req, res, next) => {
+  fetchBucketContents()
+    .then(data => res.send(data))
+    .catch(err => next(err));
 });
 
 // server functionality from https://jsonworld.com/demo/video-streaming-with-nodejs

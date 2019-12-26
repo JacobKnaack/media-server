@@ -10,10 +10,14 @@
 
 <body>
   <form action='/upload' method="POST" enctype="multipart/form-data">
-    <label>Upload</label>
+    <label>Select a File</label>
     <input type="file" name="media" />
+    <label>File Name</label>
+    <input type="text" name="file-name" placeholder="My media file" />
     <input type="submit" />
   </form>
+  <ul id="media-list"></ul>
+  <div id="media-player"></div>
   <!-- <div class="row">
     <div class="col-md-3 col-md-offset-3">
       <video style="height: 400px; width:600px;" id="videoPlayer" controls muted="muted" autoplay>
@@ -21,6 +25,23 @@
       </video>
     </div>
   </div> -->
+  <script>
+    fetch('http://localhost:3000/list')
+      .then(response => response.json())
+      .then(data => renderList(data))
+      .catch(error => console.error(error));
+
+    function renderList(data) {
+      const mediaList = document.getElementById('media-list');
+      data.forEach(item => {
+        mediaList.innerHTML += `<li onClick="renderPlayer(item.key)">${item.key}</li>`;
+      });
+    }
+
+    function renderPlayer(key) {
+      const player = document.getElementById('media-player');
+    }
+  </script>
 </body>
 
 </html>

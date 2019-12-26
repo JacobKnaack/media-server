@@ -44,3 +44,5 @@
 - Data Modeling:
     - Authentication / Authorization of service access based on User.
     - Data models and associations for media features. 
+- Client UI
+    - UI needs to be created to better inform users of features and ongoing operations.

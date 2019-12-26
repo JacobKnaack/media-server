@@ -7,6 +7,10 @@
 const fs = require('fs');
 const zlib = require('zlib');
 
+function compress() {
+
+}
+
 module.exports = (path) => {
   let result = [];
   return new Promise((resolve, reject) => {
