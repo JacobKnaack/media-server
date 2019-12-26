@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "Jacob Knaack",
@@ -20,5 +20,9 @@
     "ffmpeg": "0.0.4",
     "multer": "^1.4.2",
     "node-media-server": "^2.1.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2"
   }
 }

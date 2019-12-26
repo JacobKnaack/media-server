@@ -4,33 +4,19 @@ require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const stream = require('stream');
-// const AWS = require('aws-sdk');
 const compression = require('compression');
-const multer = require('multer');
+const { uploadFromStream } = require('./storage');
 const Busboy = require('busboy');
 const app = express();
-const upload = multer();
 
-app.use(express.static('./public'));
+app.use(express.static('./static'));
 app.use(express.urlencoded({ extended: true }));
-
-function uploadFromStream(s3) {
-  const pass = new stream.PassThrough();
-
-  const params = {Bucket: process.env.AWS_S3_BUCKET, Key: process.env.AWS_S3_KEY, Body: pass};
-  s3.upload(params, function(err, data) {
-    console.log(err, data);
-  });
-
-  return pass;
-}
 
 app.post('/upload', (req, res, next) => {
   const busboy = new Busboy({ headers: req.headers });
   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
     console.log(fieldname, filename, encoding, mimetype);
-    // file.pipe(uploadFromStream(s3));
+    file.pipe(uploadFromStream(filename));
   });
 
   busboy.on('finish', function () {
@@ -76,6 +62,12 @@ app.get('/video/:videoId', function (req, res) {
   }
 })
 
-app.listen(3000, function () {
-  console.log('App is running on port 3000');
-});
+module.exports = {
+  start: (port) => {
+    app.listen(port, () =>{
+      console.log('App is running on port :', port);
+    });
+  },
+  app
+}
+
