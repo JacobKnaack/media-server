@@ -26,21 +26,21 @@
     </div>
   </div> -->
   <script>
-    fetch('http://localhost:3000/list')
-      .then(response => response.json())
-      .then(data => renderList(data))
-      .catch(error => console.error(error));
-
-    function renderList(data) {
-      const mediaList = document.getElementById('media-list');
-      data.forEach(item => {
-        mediaList.innerHTML += `<li onClick="renderPlayer(item.key)">${item.key}</li>`;
-      });
-    }
-
-    function renderPlayer(key) {
-      const player = document.getElementById('media-player');
-    }
+    // fetch('http://localhost:3000/list')
+    //   .then(response => response.json())
+    //   .then(data => renderList(data))
+    //   .catch(error => console.error(error));
+    //
+    // function renderList(data) {
+    //   const mediaList = document.getElementById('media-list');
+    //   data.forEach(item => {
+    //     mediaList.innerHTML += `<li onClick="renderPlayer(item.key)">${item.key}</li>`;
+    //   });
+    // }
+    //
+    // function renderPlayer(key) {
+    //   const player = document.getElementById('media-player');
+    // }
   </script>
 </body>
 

@@ -45,8 +45,8 @@ function fetchBucketContents() {
           console.error(err);
           reject(err);
         } else {
-          console.log('**** Objects retrieved ****', data);
-          resolve(data.contents);
+          console.log('**** Objects retrieved ****\n', data);
+          resolve(data.Contents);
         }
       });
   });

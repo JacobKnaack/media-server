@@ -4,13 +4,17 @@ require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const morgan = require('morgan');
+const cors = require('cors');
 const compression = require('compression');
 const { uploadFromStream, fetchBucketContents } = require('./storage');
 const Busboy = require('busboy');
 const app = express();
 
-app.use(express.static('./static'));
+app.use(morgan('dev'));
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // uploads a file to the configured S3 bucket
 app.post('/upload', (req, res, next) => {
@@ -22,21 +26,35 @@ app.post('/upload', (req, res, next) => {
 
   busboy.on('finish', function () {
     res.writeHead(200, { 'Connection': 'close' });
-    res.end("That's all folks!");
+    res.end("File Uploaded!!");
   });
   return req.pipe(busboy);
 });
 
+app.post('/compress', (req, res, next) => {
+  const busboy = new Busboy({ headers: req.headers });
+  busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+    file.pipe(compressFromStream(filename));
+  });
+
+  busboy.on('finish', function() {
+    res.writeHead(200, { 'Connection': 'close' });
+    res.end("File Uploaded!!");
+  });
+
+  return req.pipe(busboy);
+})
+
 // fetches all objects from the configured S3 bucket
 app.get('/list', (req, res, next) => {
   fetchBucketContents()
-    .then(data => res.send(data))
+    .then(data => res.json(data))
     .catch(err => next(err));
 });
 
 // server functionality from https://jsonworld.com/demo/video-streaming-with-nodejs
 // author Suraj Roy
-app.get('/video/:videoId', function (req, res) {
+app.get('/media/:mediaId', function (req, res) {
   const streamPATH = path.resolve(process.env.UNSAFE_STREAM_PATH);
   const stat = fs.statSync(streamPATH);
   const fileSize = stat.size;
@@ -71,11 +89,11 @@ app.get('/video/:videoId', function (req, res) {
 })
 
 module.exports = {
+  app,
   start: (port) => {
     app.listen(port, () =>{
       console.log('App is running on port :', port);
     });
   },
-  app
 }
 

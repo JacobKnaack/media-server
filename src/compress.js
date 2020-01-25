@@ -5,9 +5,11 @@
  */
 
 const fs = require('fs');
+const stream = require('stream');
 const zlib = require('zlib');
 
-function compress() {
+function compressFromStream() {
+  const pass = new stream.PassThrough();
 
 }
 

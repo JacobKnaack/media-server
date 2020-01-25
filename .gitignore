@@ -1,6 +1,9 @@
 # Created by https://www.gitignore.io/api/osx,node,webstorm
 # Edit at https://www.gitignore.io/?templates=osx,node,webstorm
 
+### Mongo ###
+db
+
 ### Node ###
 # Logs
 logs
