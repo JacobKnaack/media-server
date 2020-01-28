@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --watch",
+    "test": "mocha",
+    "watch": "mocha --watch",
     "prestart": "pgrep mongod || mkdir -p ./db && mongod --dbpath ./db --fork --logpath ./db/db.startup.log",
     "start": "nodemon index.js",
     "heroku-start": "node index.js"
