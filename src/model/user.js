@@ -11,24 +11,31 @@ const User = new mongoose.Schema({
   password: { type: String, require: true },
 });
 
-User.pre('save', async () => {
+User.pre('save', async function() {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
 });
 
-User.statics.authenticateBasic = () => {
+User.statics.authenticateBasic = function(auth) {
+  let query = {email:auth.email};
+  return this.findOne(query)
+    .then( user => user && user.comparePassword(auth.password) )
+    .catch(error => {throw error;});
+};
+
+User.statics.authenticateBearer = function(token) {
 
 };
 
-User.statics.authenticateBearer = () => {
-
+User.methods.comparePassword = function(password) {
+  return bcrypt.compare( password, this.password )
+    .then( valid => valid ? this : null);
 };
 
-User.methods.generateToken = () => {
+User.methods.generateToken = function() {
   let options = { email: this.email };
-  let token = jwt.sign(options, KEY);
-  return token;
+  return jwt.sign(options, KEY);
 };
 
 module.exports = mongoose.model('users', User);

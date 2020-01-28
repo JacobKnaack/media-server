@@ -7,29 +7,20 @@ const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
-const { uploadFromStream, fetchBucketContents } = require('./storage');
 const Busboy = require('busboy');
 const app = express();
+
+const authRouter = require('./router/auth');
+const mediaRouter = require('./router/media');
 
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// uploads a file to the configured S3 bucket
-app.post('/upload', (req, res, next) => {
-  const busboy = new Busboy({ headers: req.headers });
-  busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-    console.log(fieldname, filename, encoding, mimetype);
-    file.pipe(uploadFromStream(filename));
-  });
+app.use(authRouter);
+app.use('/media', mediaRouter);
 
-  busboy.on('finish', function () {
-    res.writeHead(200, { 'Connection': 'close' });
-    res.end("File Uploaded!!");
-  });
-  return req.pipe(busboy);
-});
 
 app.post('/compress', (req, res, next) => {
   const busboy = new Busboy({ headers: req.headers });
@@ -43,16 +34,9 @@ app.post('/compress', (req, res, next) => {
   });
 
   return req.pipe(busboy);
-})
-
-// fetches all objects from the configured S3 bucket
-app.get('/list', (req, res, next) => {
-  fetchBucketContents()
-    .then(data => res.json(data))
-    .catch(err => next(err));
 });
 
-// server functionality from https://jsonworld.com/demo/video-streaming-with-nodejs
+// streaming functionality from https://jsonworld.com/demo/video-streaming-with-nodejs
 // author Suraj Roy
 app.get('/media/:mediaId', function (req, res) {
   const streamPATH = path.resolve(process.env.UNSAFE_STREAM_PATH);
@@ -74,7 +58,7 @@ app.get('/media/:mediaId', function (req, res) {
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
       'Content-Type': 'video/mp4',
-    }
+    };
 
     res.writeHead(206, head);
     file.pipe(res);
@@ -86,7 +70,7 @@ app.get('/media/:mediaId', function (req, res) {
     res.writeHead(200, head);
     fs.createReadStream(streamPATH).pipe(res);
   }
-})
+});
 
 module.exports = {
   app,
@@ -95,5 +79,4 @@ module.exports = {
       console.log('App is running on port :', port);
     });
   },
-}
-
+};
